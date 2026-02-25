@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-V3
     <meta charset="UTF-8">
-    <title>注音符號大冒險 V3</title>
+    <title>注音符號大冒險</title>
     <style>
         body { font-family: '微軟正黑體', sans-serif; background-color: #E1F5FE; text-align: center; padding: 20px; }
         .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .main-title { color: #0288D1; font-size: 2.8rem; margin-bottom: 10px; }
         .sub-title { color: #4FC3F7; font-size: 1.2rem; margin-bottom: 25px; }
         
+        /* 顯示區：修正初始文字過大問題 */
         #display-area { 
-            font-size: 3rem; 
+            font-size: 3rem; /* 初始文字較小 */
             margin: 30px auto; height: 180px; width: 80%;
             display: flex; align-items: center; justify-content: center; 
             color: #0288D1; border: 5px dashed #B3E5FC; border-radius: 20px;
-            transition: font-size 0.2s;
+            transition: font-size 0.2s; /* 點擊時放大的動畫 */
         }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; padding: 20px; }
@@ -26,29 +26,59 @@ V3
         }
         .bo-btn:active { transform: translateY(4px); box-shadow: 0 2px #81D4FA; }
         .bo-btn.vowel { background: #FFCC80; color: #E65100; box-shadow: 0 5px #FFB74D; }
+/* 拼音大師專屬：紫色大回首頁鈕 */
+    .home-btn-large {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 85px;
+        height: 85px;
+        background-color: #9C27B0; /* 紫色 */
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px #7B1FA2;
+        transition: 0.2s;
+        z-index: 9999;
+        font-weight: bold;
+    }
 
-        .home-btn-large {
-            position: fixed; top: 20px; left: 20px; width: 85px; height: 85px;
-            background-color: #9C27B0; color: white; text-decoration: none;
-            border-radius: 25px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; box-shadow: 0 8px #7B1FA2;
-            transition: 0.2s; z-index: 9999; font-weight: bold;
-        }
-        .home-btn-large span { font-size: 2.2rem; margin-bottom: -5px; }
-        .home-text { font-size: 1rem; }
+    .home-btn-large span {
+        font-size: 2.2rem;
+        margin-bottom: -5px;
+    }
 
-        @media (max-width: 600px) { .container { margin-top: 100px; } }
-        @media (orientation: portrait) { .container { flex-direction: column; } }
+    .home-text {
+        font-size: 1rem;
+    }
+
+    .home-btn-large:hover {
+        transform: scale(1.1);
+        filter: brightness(1.1);
+    }
+
+    .home-btn-large:active {
+        transform: translateY(4px);
+        box-shadow: 0 4px #7B1FA2;
+    }
+
+    /* 確保手機版標題不會被按鈕壓到 */
+    @media (max-width: 600px) {
+        .container { margin-top: 100px; }
+    }
     </style>
 </head>
 <body>
-
 <a href="index.html" class="home-btn-large">
-    <span>🏠</span><div class="home-text">首頁</div>
+    <span>🏠</span>
+    <div class="home-text">首頁</div>
 </a>
-
 <div class="container">
-    <h1 class="main-title">ㄅㄆㄇ 注音大冒險 V3</h1>
+    <h1 class="main-title">ㄅㄆㄇ 注音大冒險</h1>
     <p class="sub-title">點點看，跟著聲音一起唸唸看喔！</p>
     
     <div id="display-area">🌟 選一個注音 🌟</div>
@@ -73,35 +103,26 @@ V3
         if (index >= 21) btn.classList.add('vowel');
 
         btn.onclick = () => {
+            // 切換為大字體
             display.innerText = char;
             display.style.fontSize = "10rem"; 
+            
+            // 回到第一版的發音方式：直接讀注音
             speak(char);
         };
         grid.appendChild(btn);
     });
 
-    function speak(t) {
+    function speak(text) {
+        // 停止之前的發音
         window.speechSynthesis.cancel();
         
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        let processedText = t;
-
-        // 聲母清單
-        const initials = ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄏ", "ㄐ", "ㄑ", "ㄒ", "ㄓ", "ㄔ", "ㄕ", "ㄖ", "ㄗ", "ㄘ", "ㄙ"];
-        
-        if (isIOS && initials.includes(t)) {
-            // 用「注音 + ㄜ」來騙 iPad 不要發出「ㄛ」的音
-            processedText = t + "ㄜ";
-        }
-
-        const m = new SpeechSynthesisUtterance(processedText);
-        m.lang = 'zh-TW';
-        
-        // 語速拉到 1.0 會更俐落清脆
-        m.rate = 1.0; 
-        m.pitch = 1.1; 
-
-        window.speechSynthesis.speak(m);
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = text;
+        msg.lang = 'zh-TW';
+        msg.rate = 0.8; 
+        msg.pitch = 1.0; 
+        window.speechSynthesis.speak(msg);
     }
 </script>
 
