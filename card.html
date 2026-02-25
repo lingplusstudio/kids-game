@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+測試版
     <meta charset="UTF-8">
     <title>注音符號大冒險</title>
     <style>
@@ -86,12 +87,6 @@
     <div class="grid" id="bopomofo-grid"></div>
 </div>
 
-別擔心！我懂那種怕改壞的心情。既然妳現在已經把「實驗室代碼」接在原本的 speak 函數後面了，我們就用最穩險的方式，直接把「改良版測試器」加進去，確保它能解決 iPad 抓不到聲音的問題。
-
-這段程式碼我已經幫妳把原本的注音邏輯跟加強版測試器揉在一起了。
-
-✅ 請直接「全選」下方代碼，覆蓋掉妳目前的 <script>...</script>：
-JavaScript
 <script>
     const bopomofo = [
         'ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ','ㄍ','ㄎ','ㄏ',
@@ -102,13 +97,12 @@ JavaScript
     const grid = document.getElementById('bopomofo-grid');
     const display = document.getElementById('display-area');
 
-    // 1. 產生原本的注音按鈕
+    // 1. 產生注音按鈕
     bopomofo.forEach((char, index) => {
         const btn = document.createElement('button');
         btn.innerText = char;
         btn.className = 'bo-btn';
         if (index >= 21) btn.classList.add('vowel');
-
         btn.onclick = () => {
             display.innerText = char;
             display.style.fontSize = "10rem"; 
@@ -117,48 +111,51 @@ JavaScript
         grid.appendChild(btn);
     });
 
-    // 2. 原本的發音函數
+    // 2. 改良版發音函數：優先鎖定妳喜歡的老師
     function speak(text) {
         window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = text;
+        const msg = new SpeechSynthesisUtterance(text);
+        
+        // 取得目前所有可用的老師
+        const voices = window.speechSynthesis.getVoices();
+        
+        // 🌟 尋找優先順序：Zhiwei (電腦男聲) > Gary (iPad男聲) > Hsuan-wen (iPad女聲)
+        const targetVoice = voices.find(v => v.name.includes("Zhiwei")) || 
+                            voices.find(v => v.name.includes("Gary")) || 
+                            voices.find(v => v.name.includes("嘉里")) ||
+                            voices.find(v => v.name.includes("Hsuan-wen"));
+
+        if (targetVoice) {
+            msg.voice = targetVoice;
+        }
+
         msg.lang = 'zh-TW';
-        msg.rate = 0.8; 
+        msg.rate = 0.9; // 稍微快一點點，發音會更俐落
         msg.pitch = 1.0; 
         window.speechSynthesis.speak(msg);
     }
 
-    // 3. 🌟 聲音測試實驗室 (加強版：解決 iPad 沒聲音問題)
+    // 3. 🌟 聲音測試實驗室 (V8：解決 iPad 顯示問題)
     function createVoiceTester() {
-        // 先移除舊的測試區，避免重複出現
         const oldDiv = document.getElementById('lab-div');
         if (oldDiv) oldDiv.remove();
 
         const voices = window.speechSynthesis.getVoices();
-        // 只抓台灣與香港的中文人聲
-        const zhVoices = voices.filter(v => v.lang.includes("zh-TW") || v.lang.includes("zh-HK"));
+        const zhVoices = voices.filter(v => v.lang.includes("zh-TW"));
         
         const testDiv = document.createElement('div');
         testDiv.id = 'lab-div';
-        testDiv.style.marginTop = "50px";
-        testDiv.style.padding = "20px";
-        testDiv.style.borderTop = "3px dashed #0288D1";
-        testDiv.style.backgroundColor = "#F1F8E9";
-        testDiv.style.borderRadius = "20px";
+        testDiv.style.cssText = "margin-top:50px; padding:20px; border-top:3px dashed #0288D1; background:#F1F8E9; border-radius:20px;";
         
-        testDiv.innerHTML = "<h3>🎤 聲音實驗室 (V7)</h3><p>點點看哪個老師唸「ㄅ」最好聽：</p>";
+        testDiv.innerHTML = `<h3>🎤 聲音實驗室 (V8)</h3><p>目前抓到 ${zhVoices.length} 位台灣老師：</p>`;
         
         if (zhVoices.length === 0) {
-            testDiv.innerHTML += "<p style='color:red;'>⚠️ 偵測不到老師，請點擊螢幕任意處再試試，或檢查 iPad 是否下載了語音包。</p>";
+            testDiv.innerHTML += "<p style='color:red;'>⚠️ 偵測不到老師，請點擊螢幕任意處或重新整理試試。</p>";
         }
 
         zhVoices.forEach(voice => {
             const btn = document.createElement('button');
-            btn.style.margin = "8px";
-            btn.style.padding = "12px";
-            btn.style.borderRadius = "10px";
-            btn.style.border = "1px solid #ccc";
-            btn.style.cursor = "pointer";
+            btn.style.cssText = "margin:8px; padding:12px; border-radius:10px; border:1px solid #ccc; cursor:pointer;";
             btn.innerText = `試聽：${voice.name}`;
             
             btn.onclick = () => {
@@ -168,7 +165,6 @@ JavaScript
                 m.lang = 'zh-TW';
                 m.rate = 0.9;
                 window.speechSynthesis.speak(m);
-                // 點擊後把名字顯色，方便妳記住
                 btn.style.backgroundColor = "#C8E6C9";
             };
             testDiv.appendChild(btn);
@@ -176,10 +172,9 @@ JavaScript
         document.body.appendChild(testDiv);
     }
 
-    // 🌟 關鍵：當聲音清單改變時立刻更新，並在載入後嘗試執行
+    // 確保 iPad 在聲音清單改變時能重新抓取
     window.speechSynthesis.onvoiceschanged = createVoiceTester;
     setTimeout(createVoiceTester, 1000);
 </script>
-
 </body>
 </html>
