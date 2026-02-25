@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+V2
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LINGPLUS 幼兒英文</title>
@@ -82,6 +83,16 @@
             transform: translateY(2px); 
             box-shadow: 0 1px #1976D2; 
         }
+/* 當 iPad 直著拿時 */
+@media (orientation: portrait) {
+    .container {
+        flex-direction: column; /* 讓內容上下排列 */
+    }
+    .main-char {
+        font-size: 15rem; /* 字母可以放得跟臉一樣大 */
+        margin-top: 20vh;
+    }
+}
     </style>
 </head>
 <body>
@@ -455,10 +466,24 @@ speak("Where is it? " + currentQuizWord.w + ".");
         nextQuestion();
     }
 
-    function speak(t) {
+  function speak(t) {
+        // 1. 強制停止之前的聲音
         window.speechSynthesis.cancel();
-        const m = new SpeechSynthesisUtterance(t);
-        m.lang = 'en-US'; m.rate = 0.70;
+
+        // 2. 建立發音物件（先不傳入文字）
+        const m = new SpeechSynthesisUtterance();
+        
+        // 🌟 核心修正：先處理文字，轉成小寫
+        // 加上一個空格或句號，有助於 iOS 判斷這是一個「單字」而非「拼寫字母」
+        const processedText = t.toLowerCase() + "."; 
+
+        // 3. 設定參數
+        m.text = processedText; // 這裡才賦予文字
+        m.lang = 'en-US'; 
+        m.rate = 0.70;
+        m.pitch = 1.0;
+
+        // 4. 開始發音
         window.speechSynthesis.speak(m);
     }
 // 🔊 重聽功能：再唸一次目前的單字

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+V2
     <meta charset="UTF-8">
     <title>幼兒注音趣味學習</title>
    <style>
@@ -45,6 +46,20 @@
     /* 回首頁隱藏或縮小，避免擠壓空間 */
     .home-btn-large { position: fixed; top: 2px; left: 2px; width: 45px; height: 45px; background-color: #9C27B0; color: white; text-decoration: none; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; font-weight: bold; font-size: 0.6rem; opacity: 0.8; }
     .home-btn-large span { font-size: 1rem; }
+/* 當 iPad 橫著拿時 */
+@media (orientation: landscape) {
+    .game-area {
+        display: flex;
+        justify-content: space-around; /* 讓內容左右排開 */
+        align-items: center;
+    }
+    .button-panel {
+        width: 40%; /* 按鈕放在右邊 */
+    }
+    .visual-display {
+        width: 50%; /* 水果或大字放在左邊 */
+    }
+}
 </style>
 </head>
 <body>
@@ -676,10 +691,41 @@
         if(s) speak(s);
     }
 
-    function speak(t) {
+   function speak(t) {
+        // 1. 停止之前的發音
         window.speechSynthesis.cancel();
-        const m = new SpeechSynthesisUtterance(t);
+        
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        let processedText = t;
+
+        // 🌟 對付 iPad 的「注音轉拼音」對照表
+        const bopomofoToPinyin = {
+            "ㄅ": "be", "ㄆ": "pe", "ㄇ": "me", "ㄈ": "fe",
+            "ㄉ": "de", "ㄊ": "te", "ㄋ": "ne", "ㄌ": "le",
+            "ㄍ": "ge", "ㄎ": "ke", "ㄏ": "he",
+            "ㄐ": "ji", "ㄑ": "qi", "ㄒ": "xi",
+            "ㄓ": "zhi", "ㄔ": "chi", "ㄕ": "shi", "ㄖ": "ri",
+            "ㄗ": "zi", "ㄘ": "ci", "ㄙ": "si"
+        };
+
+        // 如果是單獨點擊聲母，且在 iOS 上，使用拼音來強迫發出「ㄜ」的尾音
+        if (isIOS && bopomofoToPinyin[t]) {
+            processedText = bopomofoToPinyin[t];
+        } 
+        // 如果是「拼拼看」組合音（長度大於1），就維持原樣交給系統拼讀
+        else if (isIOS && t.length === 1 && ["ㄧ", "ㄨ", "ㄩ"].includes(t)) {
+            processedText = t + " ";
+        }
+
+        const m = new SpeechSynthesisUtterance(processedText);
+        
+        // 設定語言為台灣中文
         m.lang = 'zh-TW';
+        
+        // 🌟 語速稍微調快到 0.9，可以有效降低「ㄅㄛ」那種沉重的感覺
+        m.rate = 0.9; 
+        m.pitch = 1.0; 
+
         window.speechSynthesis.speak(m);
     }
 

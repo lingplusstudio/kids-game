@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+V2
     <meta charset="UTF-8">
     <title>幼兒數學小天才</title>
     <style>
@@ -38,6 +39,20 @@
         .next-btn { padding: 10px 40px; font-size: 1.2rem; cursor:pointer; border-radius: 50px; background: #33691E; color: white; border: none; box-shadow: 0 4px #1B5E20; font-weight: bold; margin-bottom: 5px; }
         .home-btn-large { position: fixed; top: 5px; left: 5px; width: 45px; height: 45px; background-color: #9C27B0; color: white; text-decoration: none; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; font-weight: bold; font-size: 0.6rem; opacity: 0.8; }
         
+/* 當 iPad 橫著拿時 */
+@media (orientation: landscape) {
+    .game-area {
+        display: flex;
+        justify-content: space-around; /* 讓內容左右排開 */
+        align-items: center;
+    }
+    .button-panel {
+        width: 40%; /* 按鈕放在右邊 */
+    }
+    .visual-display {
+        width: 50%; /* 水果或大字放在左邊 */
+    }
+}
     </style>
 </head>
 <body>

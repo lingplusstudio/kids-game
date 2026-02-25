@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+V2
     <meta charset="UTF-8">
     <title>注音符號大冒險</title>
     <style>
@@ -70,6 +71,16 @@
     @media (max-width: 600px) {
         .container { margin-top: 100px; }
     }
+/* 當 iPad 直著拿時 */
+@media (orientation: portrait) {
+    .container {
+        flex-direction: column; /* 讓內容上下排列 */
+    }
+    .main-char {
+        font-size: 15rem; /* 字母可以放得跟臉一樣大 */
+        margin-top: 20vh;
+    }
+}
     </style>
 </head>
 <body>
@@ -113,16 +124,48 @@
         grid.appendChild(btn);
     });
 
-    function speak(text) {
-        // 停止之前的發音
+   這是一個非常典型的 Web Speech API 在不同系統下的詮釋問題。妳的程式碼雖然已經寫了 t + "ㄜ" 來修正，但有些版本的 iPad 語音引擎對「注音符號」的優先權極高，它只要看到「ㄅ」這個字，就會立刻跳轉到它內建的「ㄅㄛ」發音，甚至無視妳後面加的「ㄜ」。
+
+此外，我發現妳的程式碼最後多出了一段重複且錯誤的 msg.text 邏輯，這會導致發音衝突。
+
+🛠️ 針對 iPad 「ㄅㄛ」音的終極解決方案
+要破解 iPad 內建的強制發音，最有效的方法是 「把注音變成拼音」 交給它。對 iPad 的 zh-TW 語音來說，傳送拼音字串（如 "be"）往往比傳送注音符號更能發出清脆的聲母音。
+
+請直接將妳的 speak 函數替換成這段 「注音轉拼音」 強制修正版：
+
+JavaScript
+    function speak(t) {
         window.speechSynthesis.cancel();
         
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = text;
-        msg.lang = 'zh-TW';
-        msg.rate = 0.8; 
-        msg.pitch = 1.0; 
-        window.speechSynthesis.speak(msg);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        let processedText = t;
+
+        // 🌟 對付 iPad 的「注音轉拼音」對照表
+        const bopomofoToPinyin = {
+            "ㄅ": "be", "ㄆ": "pe", "ㄇ": "me", "ㄈ": "fe",
+            "ㄉ": "de", "ㄊ": "te", "ㄋ": "ne", "ㄌ": "le",
+            "ㄍ": "ge", "ㄎ": "ke", "ㄏ": "he",
+            "ㄐ": "ji", "ㄑ": "qi", "ㄒ": "xi",
+            "ㄓ": "zhi", "ㄔ": "chi", "ㄕ": "shi", "ㄖ": "ri",
+            "ㄗ": "zi", "ㄘ": "ci", "ㄙ": "si"
+        };
+
+        // 如果是 iOS 且在清單中，直接餵它拼音，強制它發出「ㄜ」的尾音
+        if (isIOS && bopomofoToPinyin[t]) {
+            processedText = bopomofoToPinyin[t];
+        } else if (isIOS && ["ㄧ", "ㄨ", "ㄩ"].includes(t)) {
+            // 處理介符，稍微拉長一點點
+            processedText = t + " ";
+        }
+
+        const m = new SpeechSynthesisUtterance(processedText);
+        m.lang = 'zh-TW';
+        
+        // 🌟 語速稍微調快一點點 (0.9)，可以讓「ㄅㄛ」感消失，更接近「ㄅ」
+        m.rate = 0.9; 
+        m.pitch = 1.0; 
+
+        window.speechSynthesis.speak(m);
     }
 </script>
 
