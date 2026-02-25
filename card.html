@@ -124,6 +124,40 @@
         msg.pitch = 1.0; 
         window.speechSynthesis.speak(msg);
     }
+// 聲音測試實驗室：自動列出所有中文聲音
+function createVoiceTester() {
+    const voices = window.speechSynthesis.getVoices();
+    const zhVoices = voices.filter(v => v.lang.includes("zh-TW") || v.lang.includes("zh-HK"));
+    
+    // 建立一個測試區域
+    const testDiv = document.createElement('div');
+    testDiv.style.marginTop = "50px";
+    testDiv.style.padding = "20px";
+    testDiv.style.borderTop = "2px solid #ccc";
+    testDiv.innerHTML = "<h3>🎤 聲音實驗室 (點點看哪個 ㄅ 最準)</h3>";
+    
+    zhVoices.forEach(voice => {
+        const btn = document.createElement('button');
+        btn.style.margin = "5px";
+        btn.style.padding = "10px";
+        btn.innerText = `試聽：${voice.name}`;
+        
+        btn.onclick = () => {
+            window.speechSynthesis.cancel();
+            const m = new SpeechSynthesisUtterance("ㄅ");
+            m.voice = voice; // 🌟 指定這個聲音
+            m.lang = 'zh-TW';
+            m.rate = 0.9;
+            window.speechSynthesis.speak(m);
+            console.log("正在使用聲音：", voice.name);
+        };
+        testDiv.appendChild(btn);
+    });
+    document.body.appendChild(testDiv);
+}
+
+// 因為聲音清單載入較慢，我們等一秒後再執行
+setTimeout(createVoiceTester, 1000);
 </script>
 
 </body>
