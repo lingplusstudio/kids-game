@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+測試版
     <meta charset="UTF-8">
     <title>注音符號大冒險</title>
     <style>
@@ -114,31 +115,34 @@
     });
 
     function speak(text) {
-    window.speechSynthesis.cancel();
-    
-    const msg = new SpeechSynthesisUtterance();
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        // 1. 停止之前的發音
+        window.speechSynthesis.cancel();
+        
+        const msg = new SpeechSynthesisUtterance();
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        
+        // 2. 🌟 針對「ㄅㄆㄈ」進行近似音替換
+        if (isIOS && text === "ㄅ") {
+            msg.text = "ber";  // 試圖發出較輕的 /b/
+            msg.lang = 'en-US';
+        } else if (isIOS && text === "ㄆ") {
+            msg.text = "per";  // 試圖發出較輕的 /p/
+            msg.lang = 'en-US';
+        } else if (isIOS && text === "ㄈ") {
+            msg.text = "fer";  // 試圖發出較輕的 /f/
+            msg.lang = 'en-US';
+        } else {
+            // 其他注音維持原本的中文發音
+            msg.text = text;
+            msg.lang = 'zh-TW';
+        }
 
-    // 🌟 只針對這三個字在 iPad 上切換為英文發音
-    if (isIOS && text === "ㄅ") {
-        msg.text = "b";         // 發出 /b/ 音
-        msg.lang = 'en-US';
-    } else if (isIOS && text === "ㄆ") {
-        msg.text = "p";         // 發出 /p/ 音
-        msg.lang = 'en-US';
-    } else if (isIOS && text === "ㄈ") {
-        msg.text = "f";         // 發出 /f/ 音
-        msg.lang = 'en-US';
-    } else {
-        // 其他所有注音（包含ㄇ）維持原本的中文發音
-        msg.text = text;
-        msg.lang = 'zh-TW';
+        // 3. 語速與音調設定
+        msg.rate = 0.8; 
+        msg.pitch = 1.0; 
+        
+        window.speechSynthesis.speak(msg);
     }
-
-    msg.rate = 0.8; 
-    msg.pitch = 1.0; 
-    window.speechSynthesis.speak(msg);
-}
 </script>
 
 </body>
