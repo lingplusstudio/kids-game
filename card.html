@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-V2
+V3
     <meta charset="UTF-8">
-    <title>注音符號大冒險</title>
+    <title>注音符號大冒險 V3</title>
     <style>
         body { font-family: '微軟正黑體', sans-serif; background-color: #E1F5FE; text-align: center; padding: 20px; }
         .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .main-title { color: #0288D1; font-size: 2.8rem; margin-bottom: 10px; }
         .sub-title { color: #4FC3F7; font-size: 1.2rem; margin-bottom: 25px; }
         
-        /* 顯示區：修正初始文字過大問題 */
         #display-area { 
-            font-size: 3rem; /* 初始文字較小 */
+            font-size: 3rem; 
             margin: 30px auto; height: 180px; width: 80%;
             display: flex; align-items: center; justify-content: center; 
             color: #0288D1; border: 5px dashed #B3E5FC; border-radius: 20px;
-            transition: font-size 0.2s; /* 點擊時放大的動畫 */
+            transition: font-size 0.2s;
         }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; padding: 20px; }
@@ -27,69 +26,29 @@ V2
         }
         .bo-btn:active { transform: translateY(4px); box-shadow: 0 2px #81D4FA; }
         .bo-btn.vowel { background: #FFCC80; color: #E65100; box-shadow: 0 5px #FFB74D; }
-/* 拼音大師專屬：紫色大回首頁鈕 */
-    .home-btn-large {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: 85px;
-        height: 85px;
-        background-color: #9C27B0; /* 紫色 */
-        color: white;
-        text-decoration: none;
-        border-radius: 25px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px #7B1FA2;
-        transition: 0.2s;
-        z-index: 9999;
-        font-weight: bold;
-    }
 
-    .home-btn-large span {
-        font-size: 2.2rem;
-        margin-bottom: -5px;
-    }
+        .home-btn-large {
+            position: fixed; top: 20px; left: 20px; width: 85px; height: 85px;
+            background-color: #9C27B0; color: white; text-decoration: none;
+            border-radius: 25px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; box-shadow: 0 8px #7B1FA2;
+            transition: 0.2s; z-index: 9999; font-weight: bold;
+        }
+        .home-btn-large span { font-size: 2.2rem; margin-bottom: -5px; }
+        .home-text { font-size: 1rem; }
 
-    .home-text {
-        font-size: 1rem;
-    }
-
-    .home-btn-large:hover {
-        transform: scale(1.1);
-        filter: brightness(1.1);
-    }
-
-    .home-btn-large:active {
-        transform: translateY(4px);
-        box-shadow: 0 4px #7B1FA2;
-    }
-
-    /* 確保手機版標題不會被按鈕壓到 */
-    @media (max-width: 600px) {
-        .container { margin-top: 100px; }
-    }
-/* 當 iPad 直著拿時 */
-@media (orientation: portrait) {
-    .container {
-        flex-direction: column; /* 讓內容上下排列 */
-    }
-    .main-char {
-        font-size: 15rem; /* 字母可以放得跟臉一樣大 */
-        margin-top: 20vh;
-    }
-}
+        @media (max-width: 600px) { .container { margin-top: 100px; } }
+        @media (orientation: portrait) { .container { flex-direction: column; } }
     </style>
 </head>
 <body>
+
 <a href="index.html" class="home-btn-large">
-    <span>🏠</span>
-    <div class="home-text">首頁</div>
+    <span>🏠</span><div class="home-text">首頁</div>
 </a>
+
 <div class="container">
-    <h1 class="main-title">ㄅㄆㄇ 注音大冒險</h1>
+    <h1 class="main-title">ㄅㄆㄇ 注音大冒險 V3</h1>
     <p class="sub-title">點點看，跟著聲音一起唸唸看喔！</p>
     
     <div id="display-area">🌟 選一個注音 🌟</div>
@@ -114,56 +73,33 @@ V2
         if (index >= 21) btn.classList.add('vowel');
 
         btn.onclick = () => {
-            // 切換為大字體
             display.innerText = char;
             display.style.fontSize = "10rem"; 
-            
-            // 回到第一版的發音方式：直接讀注音
             speak(char);
         };
         grid.appendChild(btn);
     });
 
-   這是一個非常典型的 Web Speech API 在不同系統下的詮釋問題。妳的程式碼雖然已經寫了 t + "ㄜ" 來修正，但有些版本的 iPad 語音引擎對「注音符號」的優先權極高，它只要看到「ㄅ」這個字，就會立刻跳轉到它內建的「ㄅㄛ」發音，甚至無視妳後面加的「ㄜ」。
-
-此外，我發現妳的程式碼最後多出了一段重複且錯誤的 msg.text 邏輯，這會導致發音衝突。
-
-🛠️ 針對 iPad 「ㄅㄛ」音的終極解決方案
-要破解 iPad 內建的強制發音，最有效的方法是 「把注音變成拼音」 交給它。對 iPad 的 zh-TW 語音來說，傳送拼音字串（如 "be"）往往比傳送注音符號更能發出清脆的聲母音。
-
-請直接將妳的 speak 函數替換成這段 「注音轉拼音」 強制修正版：
-
-JavaScript
     function speak(t) {
         window.speechSynthesis.cancel();
         
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         let processedText = t;
 
-        // 🌟 對付 iPad 的「注音轉拼音」對照表
-        const bopomofoToPinyin = {
-            "ㄅ": "be", "ㄆ": "pe", "ㄇ": "me", "ㄈ": "fe",
-            "ㄉ": "de", "ㄊ": "te", "ㄋ": "ne", "ㄌ": "le",
-            "ㄍ": "ge", "ㄎ": "ke", "ㄏ": "he",
-            "ㄐ": "ji", "ㄑ": "qi", "ㄒ": "xi",
-            "ㄓ": "zhi", "ㄔ": "chi", "ㄕ": "shi", "ㄖ": "ri",
-            "ㄗ": "zi", "ㄘ": "ci", "ㄙ": "si"
-        };
-
-        // 如果是 iOS 且在清單中，直接餵它拼音，強制它發出「ㄜ」的尾音
-        if (isIOS && bopomofoToPinyin[t]) {
-            processedText = bopomofoToPinyin[t];
-        } else if (isIOS && ["ㄧ", "ㄨ", "ㄩ"].includes(t)) {
-            // 處理介符，稍微拉長一點點
-            processedText = t + " ";
+        // 聲母清單
+        const initials = ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄏ", "ㄐ", "ㄑ", "ㄒ", "ㄓ", "ㄔ", "ㄕ", "ㄖ", "ㄗ", "ㄘ", "ㄙ"];
+        
+        if (isIOS && initials.includes(t)) {
+            // 用「注音 + ㄜ」來騙 iPad 不要發出「ㄛ」的音
+            processedText = t + "ㄜ";
         }
 
         const m = new SpeechSynthesisUtterance(processedText);
         m.lang = 'zh-TW';
         
-        // 🌟 語速稍微調快一點點 (0.9)，可以讓「ㄅㄛ」感消失，更接近「ㄅ」
-        m.rate = 0.9; 
-        m.pitch = 1.0; 
+        // 語速拉到 1.0 會更俐落清脆
+        m.rate = 1.0; 
+        m.pitch = 1.1; 
 
         window.speechSynthesis.speak(m);
     }
