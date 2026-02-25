@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINGPLUS 幼兒英文</title>
+    <style>
+        body { font-family: '微軟正黑體', sans-serif; background-color: #E3F2FD; text-align: center; padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        h1 { color: #1565C0; font-size: 2.5rem; margin-bottom: 5px; }
+        .subtitle { color: #42A5F5; font-weight: bold; margin-bottom: 20px; font-size: 1.2rem; }
+        
+        /* 回首頁按鈕 */
+        .home-btn-large {
+            position: fixed; top: 20px; left: 20px; width: 85px; height: 85px; background-color: #9C27B0;
+            color: white; text-decoration: none; border-radius: 25px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; box-shadow: 0 8px #7B1FA2; transition: 0.2s; z-index: 9999; font-weight: bold;
+        }
+        .home-btn-large span { font-size: 2.2rem; margin-bottom: -5px; }
+        .home-text { font-size: 1rem; }
+        .home-btn-large:active { transform: translateY(4px); box-shadow: 0 4px #7B1FA2; }
+
+        /* --- 模式切換標籤 (Tab) --- */
+        .mode-switch { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .mode-btn { 
+            padding: 12px 25px; font-size: 1.3rem; font-weight: bold; border-radius: 30px; border: none; 
+            background: #E0E0E0; color: #757575; cursor: pointer; transition: 0.3s; box-shadow: 0 4px #BDBDBD;
+        }
+        .mode-btn.active { background: #FF9800; color: white; box-shadow: 0 6px #F57C00; transform: scale(1.05); }
+        .mode-btn:active { transform: translateY(3px); box-shadow: 0 2px #BDBDBD; }
+        .mode-btn.active:active { box-shadow: 0 2px #F57C00; }
+
+        /* --- 顯示字卡區 --- */
+        .flashcard {
+            background: #FFF9C4; border-radius: 30px; padding: 20px; margin: 0 auto 20px auto;
+            max-width: 500px; box-shadow: 0 8px 15px rgba(0,0,0,0.1); border: 5px dashed #FFEB3B;
+            transition: 0.3s; height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+        }
+        #fc-emoji { font-size: 7.5rem; line-height: 1; animation: bounceIn 0.5s; font-weight: bold; color: #1565C0; margin: 0; }
+        #fc-word { font-size: 3rem; color: #E65100; font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
+        #fc-sentence { font-size: 1.5rem; color: #555; margin-bottom: 10px; }
+        @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 80% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+
+        /* 字母鍵盤區 */
+        .grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px; }
+        .alpha-btn { 
+            width: 80px; height: 80px; font-size: 2rem; cursor: pointer; border: none; border-radius: 20px; 
+            background: #BBDEFB; color: #0D47A1; box-shadow: 0 6px #90CAF9; transition: 0.2s; font-weight: bold;
+        }
+        .alpha-btn:active { transform: translateY(4px); box-shadow: 0 2px #90CAF9; }
+
+        /* --- 考試模式專用樣式 --- */
+        #exam-section { display: none; background: #E8F5E9; border-radius: 30px; padding: 40px; border: 5px solid #4CAF50; margin-top: 10px; min-height: 250px; position: relative; }
+        
+        /* 記分板 */
+        .score-board { position: absolute; top: 20px; right: 30px; font-size: 1.5rem; font-weight: bold; color: #2E7D32; background: #C8E6C9; padding: 8px 20px; border-radius: 20px; }
+        
+        #exam-emoji { font-size: 7rem; margin-bottom: 20px; }
+        .exam-options { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .exam-btn { padding: 15px 30px; font-size: 1.8rem; font-weight: bold; border-radius: 20px; border: none; background: #4CAF50; color: white; cursor: pointer; box-shadow: 0 6px #388E3C; transition: 0.2s; }
+        .exam-btn:active { transform: translateY(3px); box-shadow: 0 3px #388E3C; }
+        
+        /* 動作按鈕樣式 */
+        .action-btn { padding: 15px 30px; font-size: 1.5rem; font-weight: bold; border-radius: 30px; border: none; cursor: pointer; margin: 10px; transition: 0.2s; }
+        .btn-continue { background: #FF9800; color: white; box-shadow: 0 6px #F57C00; }
+        .btn-continue:active { transform: translateY(3px); box-shadow: 0 3px #F57C00; }
+        .btn-stop { background: #9E9E9E; color: white; box-shadow: 0 6px #616161; }
+        .btn-stop:active { transform: translateY(3px); box-shadow: 0 3px #616161; }
+.replay-btn { 
+            padding: 10px 20px; 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            border-radius: 20px; 
+            background: #2196F3; /* 明亮的藍色 */
+            color: white; 
+            border: none; 
+            box-shadow: 0 4px #1976D2; 
+            font-weight: bold; 
+            margin: 5px; 
+        }
+        .replay-btn:active { 
+            transform: translateY(2px); 
+            box-shadow: 0 1px #1976D2; 
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="home-btn-large">
+    <span>🏠</span><div class="home-text">首頁</div>
+</a>
+
+<div class="container">
+    <h1>簡單幼兒英文趣味學習</h1>
+    <p class="subtitle">LINGPLUS 互動英語樂園</p>
+
+    <div class="mode-switch">
+        <button class="mode-btn active" id="btn-alpha" onclick="switchMode('alpha')">🔤 字母認讀</button>
+        <button class="mode-btn" id="btn-vocab" onclick="switchMode('vocab')">🎁 單字盲盒</button>
+        <button class="mode-btn" id="btn-exam" onclick="switchMode('exam')">🏆 測驗遊戲</button>
+<button id="replay-btn" class="replay-btn" onclick="replayAudio()" style="display: none;">🔊 再聽一次</button>
+    </div>
+
+    <div class="flashcard" id="flashcard-area">
+        <div id="fc-emoji">🔤</div>
+        <div id="fc-word">字母模式</div>
+        <div id="fc-sentence">點擊下方字母聽發音！</div>
+    </div>
+
+    <div id="exam-section">
+        
+        <div id="exam-intro">
+            <div style="font-size: 6rem; margin-bottom: 10px;">🏆</div>
+            <h2 style="color: #2E7D32; font-size: 2.2rem; margin-top: 0;">準備好挑戰了嗎？</h2>
+            <p style="font-size: 1.3rem; color: #555;">聽聲音、看圖案，選出正確的英文單字！</p>
+            <button class="action-btn btn-continue" onclick="startExamGame()">🚀 開始測驗</button>
+        </div>
+
+        <div id="exam-play" style="display: none;">
+            <div class="score-board">連對: <span id="score-text">0</span> 題</div>
+            <h2 style="color: #2E7D32; font-size: 2rem; margin-top: 0;">聽聲音、看圖選單字！</h2>
+            <div id="exam-emoji">❓</div>
+            <div class="exam-options" id="exam-options">
+                </div>
+        </div>
+
+        <div id="exam-break" style="display: none;">
+            <div style="font-size: 6rem; margin-bottom: 10px;">🌟</div>
+            <h2 style="color: #E65100; font-size: 2.2rem; margin-top: 0;">太厲害了！連續過關！</h2>
+            <p style="font-size: 1.3rem; color: #555;">寶貝好棒！需要休息一下喝口水嗎？還是要繼續挑戰？</p>
+            <div style="margin-top: 20px;">
+                <button class="action-btn btn-stop" onclick="switchMode('alpha')">休息一下</button>
+                <button class="action-btn btn-continue" onclick="continueExam()">繼續挑戰</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid" id="alphabet-grid"></div>
+
+</div>
+
+<script>
+   // 🌟 LINGPLUS 幼兒旗艦版單字字典庫 (A-Z)
+    const dictionary = {
+        'A': [
+            {w: "Apple", s: "A red apple.", i: "🍎"}, {w: "Ant", s: "A tiny ant.", i: "🐜"},
+            {w: "Airplane", s: "Fly in an airplane.", i: "✈️"}, {w: "Alien", s: "A funny alien.", i: "👽"}, 
+            {w: "Angel", s: "A beautiful angel.", i: "👼"}, {w: "Acorn", s: "A brown acorn.", i: "🌰"}, 
+            {w: "Arrow", s: "A sharp arrow.", i: "🏹"}, {w: "Arm", s: "This is my arm.", i: "💪"}, 
+            {w: "Axe", s: "Chop with an axe.", i: "🪓"}
+        ],
+        'B': [
+            {w: "Bear", s: "The bear is sleeping.", i: "🐻"}, {w: "Banana", s: "Monkeys love bananas.", i: "🍌"},
+            {w: "Bird", s: "The bird can fly.", i: "🐦"}, {w: "Bus", s: "The yellow bus.", i: "🚌"},
+            {w: "Ball", s: "Kick the ball.", i: "⚽"}, {w: "Book", s: "Read a book.", i: "📖"},
+            {w: "Bed", s: "Go to bed.", i: "🛏️"}, {w: "Bee", s: "A busy bee.", i: "🐝"},
+            {w: "Boat", s: "A boat on the water.", i: "⛵"}, {w: "Boy", s: "He is a boy.", i: "👦"},
+            {w: "Balloon", s: "A red balloon.", i: "🎈"}, {w: "Butterfly", s: "A pretty butterfly.", i: "🦋"},
+            {w: "Bread", s: "I eat bread.", i: "🍞"}
+        ],
+        'C': [
+            {w: "Cat", s: "The cat is cute.", i: "🐱"}, {w: "Car", s: "A fast car.", i: "🚗"},
+            {w: "Cake", s: "Happy birthday cake.", i: "🍰"}, {w: "Cow", s: "The cow says moo.", i: "🐮"},
+            {w: "Cup", s: "A cup of water.", i: "☕"}, {w: "Cloud", s: "A white cloud.", i: "☁️"},
+            {w: "Clock", s: "Look at the clock.", i: "⏰"}, {w: "Crab", s: "A red crab.", i: "🦀"},
+            {w: "Carrot", s: "Rabbits eat carrots.", i: "🥕"}, {w: "Coat", s: "Put on your coat.", i: "🧥"},
+            {w: "Camera", s: "Take a picture.", i: "📷"}, {w: "Chair", s: "Sit on the chair.", i: "🪑"}
+        ],
+        'D': [
+            {w: "Dog", s: "The dog is barking.", i: "🐶"}, {w: "Duck", s: "The duck says quack.", i: "🦆"},
+            {w: "Door", s: "Open the door.", i: "🚪"}, {w: "Dinosaur", s: "A big dinosaur.", i: "🦖"},
+            {w: "Doll", s: "A pretty doll.", i: "🎎"}, {w: "Drum", s: "Play the drum.", i: "🥁"},
+            {w: "Dress", s: "A beautiful dress.", i: "👗"}, {w: "Dolphin", s: "The dolphin swims.", i: "🐬"},
+            {w: "Doctor", s: "The doctor helps me.", i: "👨‍⚕️"}, {w: "Donut", s: "A sweet donut.", i: "🍩"}
+        ],
+        'E': [
+            {w: "Elephant", s: "A very big elephant.", i: "🐘"}, {w: "Egg", s: "I eat an egg.", i: "🥚"},
+            {w: "Eye", s: "I see with my eyes.", i: "👁️"}, {w: "Ear", s: "I hear with my ears.", i: "👂"},
+            {w: "Earth", s: "We live on Earth.", i: "🌍"}, {w: "Eagle", s: "A strong eagle.", i: "🦅"},
+            {w: "Envelope", s: "Open the envelope.", i: "✉️"}, {w: "Elf", s: "A little elf.", i: "🧝"},
+            {w: "Eight", s: "The number eight.", i: "8️⃣"}, {w: "Earthworm", s: "A long earthworm.", i: "🪱"}
+        ],
+        'F': [
+            {w: "Fish", s: "The fish is swimming.", i: "🐟"}, {w: "Flower", s: "A pretty flower.", i: "🌻"},
+            {w: "Frog", s: "The frog jumps.", i: "🐸"}, {w: "Fire", s: "The fire is hot.", i: "🔥"},
+            {w: "Fox", s: "A clever fox.", i: "🦊"}, {w: "Foot", s: "This is my foot.", i: "🦶"},
+            {w: "Flag", s: "Wave the flag.", i: "🚩"}, {w: "Farmer", s: "A busy farmer.", i: "🧑‍🌾"},
+            {w: "Fairy", s: "A flying fairy.", i: "🧚"}, {w: "Fork", s: "Eat with a fork.", i: "🍴"}
+        ],
+        'G': [
+            {w: "Goat", s: "The goat is eating.", i: "🐐"}, {w: "Grape", s: "Sweet grapes.", i: "🍇"},
+            {w: "Gift", s: "A gift for you.", i: "🎁"}, {w: "Girl", s: "She is a girl.", i: "👧"},
+            {w: "Ghost", s: "A spooky ghost.", i: "👻"}, {w: "Guitar", s: "Play the guitar.", i: "🎸"},
+            {w: "Gorilla", s: "A strong gorilla.", i: "🦍"}, {w: "Glasses", s: "Wear your glasses.", i: "👓"},
+            {w: "Giraffe", s: "A tall giraffe.", i: "🦒"}, {w: "Green", s: "A green apple.", i: "🍏"}
+        ],
+        'H': [
+            {w: "Horse", s: "I ride a horse.", i: "🐴"}, {w: "House", s: "This is my house.", i: "🏠"},
+            {w: "Hat", s: "Put on your hat.", i: "🎩"}, {w: "Hand", s: "Wash your hands.", i: "✋"},
+            {w: "Heart", s: "A red heart.", i: "❤️"}, {w: "Helicopter", s: "A fast helicopter.", i: "🚁"},
+            {w: "Hippo", s: "A big hippo.", i: "🦛"}, {w: "Hamburger", s: "A yummy hamburger.", i: "🍔"},
+            {w: "Honey", s: "Sweet honey.", i: "🍯"}, {w: "Hammer", s: "Pound with a hammer.", i: "🔨"}
+        ],
+        'I': [
+            {w: "Ice cream", s: "I love ice cream.", i: "🍦"}, {w: "Igloo", s: "A cold igloo.", i: "🧊"},
+            {w: "Island", s: "A sunny island.", i: "🏝️"}, {w: "Insect", s: "A little insect.", i: "🐛"},
+            {w: "Idea", s: "I have a good idea.", i: "💡"}, {w: "Ink", s: "Black ink.", i: "✒️"},
+            {w: "Ice", s: "Cold ice.", i: "🧊"}, {w: "Iguana", s: "A green iguana.", i: "🦎"}
+        ],
+        'J': [
+            {w: "Juice", s: "Drink some juice.", i: "🧃"}, {w: "Jacket", s: "Wear a jacket.", i: "🧥"},
+            {w: "Jeans", s: "Blue jeans.", i: "👖"}, {w: "Jeep", s: "Drive a jeep.", i: "🚙"},
+            {w: "Jelly", s: "Sweet jelly.", i: "🍮"}, {w: "Judge", s: "A wise judge.", i: "👨‍⚖️"},
+            {w: "Jump", s: "Jump up high.", i: "🤾"}
+        ],
+        'K': [
+            {w: "Kangaroo", s: "The kangaroo jumps.", i: "🦘"}, {w: "Key", s: "Use the key.", i: "🔑"},
+            {w: "Kiwi", s: "A green kiwi.", i: "🥝"}, {w: "Kite", s: "Fly a kite.", i: "🪁"},
+            {w: "King", s: "The king wears a crown.", i: "👑"}, {w: "Koala", s: "A sleeping koala.", i: "🐨"},
+            {w: "Keyboard", s: "Type on the keyboard.", i: "⌨️"}, {w: "Kitten", s: "A baby cat.", i: "🐈"}
+        ],
+        'L': [
+            {w: "Lion", s: "The lion roars.", i: "🦁"}, {w: "Lemon", s: "A sour lemon.", i: "🍋"},
+            {w: "Leaf", s: "A green leaf.", i: "🍃"}, {w: "Leg", s: "This is my leg.", i: "🦵"},
+            {w: "Lamp", s: "Turn on the lamp.", i: "💡"}, {w: "Lock", s: "Lock the door.", i: "🔒"},
+            {w: "Ladybug", s: "A red ladybug.", i: "🐞"}, {w: "Lollipop", s: "A sweet lollipop.", i: "🍭"},
+            {w: "Letter", s: "Write a letter.", i: "✉️"}, {w: "Llama", s: "A fluffy llama.", i: "🦙"}
+        ],
+        'M': [
+            {w: "Monkey", s: "A funny monkey.", i: "🐵"}, {w: "Moon", s: "The moon is bright.", i: "🌙"},
+            {w: "Mouse", s: "A little mouse.", i: "🐭"}, {w: "Milk", s: "Drink your milk.", i: "🥛"},
+            {w: "Map", s: "Look at the map.", i: "🗺️"}, {w: "Mountain", s: "A high mountain.", i: "⛰️"},
+            {w: "Mirror", s: "Look in the mirror.", i: "🪞"}, {w: "Mushroom", s: "A red mushroom.", i: "🍄"},
+            {w: "Mango", s: "A sweet mango.", i: "🥭"}, {w: "Motorcycle", s: "Ride a motorcycle.", i: "🏍️"}
+        ],
+        'N': [
+            {w: "Nose", s: "Touch your nose.", i: "👃"}, {w: "Nut", s: "A hard nut.", i: "🥜"},
+            {w: "Night", s: "Good night.", i: "🌃"},
+            {w: "Nurse", s: "A kind nurse.", i: "👩‍⚕️"},
+            {w: "Necktie", s: "Wear a necktie.", i: "👔"}, {w: "Numbers", s: "Count the numbers.", i: "🔢"}
+        ],
+        'O': [
+            {w: "Owl", s: "The owl sleeps.", i: "🦉"}, {w: "Orange", s: "A sweet orange.", i: "🍊"},
+            {w: "Octopus", s: "An octopus in the sea.", i: "🐙"}, {w: "Ocean", s: "The blue ocean.", i: "🌊"},
+            {w: "Onion", s: "A round onion.", i: "🧅"}, {w: "Ox", s: "A strong ox.", i: "🐂"},
+            {w: "Oyster", s: "An oyster in the shell.", i: "🦪"}, {w: "Office", s: "Work in the office.", i: "🏢"}
+        ],
+        'P': [
+            {w: "Pig", s: "A pink pig.", i: "🐷"}, {w: "Penguin", s: "A cute penguin.", i: "🐧"},
+            {w: "Pizza", s: "I like pizza.", i: "🍕"}, {w: "Pencil", s: "Write with a pencil.", i: "✏️"},
+            {w: "Peach", s: "A soft peach.", i: "🍑"}, {w: "Panda", s: "A black and white panda.", i: "🐼"},
+            {w: "Plane", s: "The plane is flying.", i: "✈️"}, {w: "Police", s: "A brave police.", i: "👮"},
+            {w: "Parrot", s: "A colorful parrot.", i: "🦜"}, {w: "Pineapple", s: "A yellow pineapple.", i: "🍍"}
+        ],
+        'Q': [
+            {w: "Queen", s: "A beautiful queen.", i: "👸"}, {w: "Question", s: "I have a question.", i: "❓"},
+            {w: "Quiet", s: "Please be quiet.", i: "🤫"}, {w: "Quilt", s: "A warm quilt.", i: "🛌"},
+            {w: "Quail", s: "A little quail.", i: "🐦"}
+        ],
+        'R': [
+            {w: "Rabbit", s: "The rabbit hops.", i: "🐰"}, {w: "Rain", s: "It is raining.", i: "🌧️"},
+            {w: "Rose", s: "A red rose.", i: "🌹"}, {w: "Ring", s: "A gold ring.", i: "💍"},
+            {w: "Robot", s: "A smart robot.", i: "🤖"}, {w: "Rocket", s: "A fast rocket.", i: "🚀"},
+            {w: "Rainbow", s: "A colorful rainbow.", i: "🌈"}, {w: "Radio", s: "Listen to the radio.", i: "📻"},
+            {w: "Rhino", s: "A strong rhino.", i: "🦏"}, {w: "Rice", s: "Eat some rice.", i: "🍚"}
+        ],
+        'S': [
+            {w: "Sun", s: "The sun is hot.", i: "☀️"}, {w: "Star", s: "A shining star.", i: "⭐"},
+            {w: "Snake", s: "A long snake.", i: "🐍"}, {w: "Snow", s: "White snow.", i: "❄️"},
+            {w: "Spider", s: "A busy spider.", i: "🕷️"}, {w: "Shoe", s: "Put on your shoe.", i: "👞"},
+            {w: "Spoon", s: "Eat with a spoon.", i: "🥄"}, {w: "Sheep", s: "A fluffy sheep.", i: "🐑"},
+            {w: "Strawberry", s: "A red strawberry.", i: "🍓"}, {w: "Scissors", s: "Cut with scissors.", i: "✂️"}
+        ],
+        'T': [
+            {w: "Tiger", s: "A strong tiger.", i: "🐯"}, {w: "Tree", s: "A tall tree.", i: "🌳"},
+            {w: "Train", s: "Choo choo train!", i: "🚂"}, {w: "Turtle", s: "A slow turtle.", i: "🐢"},
+            {w: "Tomato", s: "A red tomato.", i: "🍅"}, {w: "Tooth", s: "Brush your teeth.", i: "🦷"},
+            {w: "Truck", s: "A big truck.", i: "🚚"}, {w: "Teacher", s: "A good teacher.", i: "👩‍🏫"},
+            {w: "Television", s: "Watch television.", i: "📺"}, {w: "Tent", s: "Sleep in a tent.", i: "⛺"}
+        ],
+        'U': [
+            {w: "Umbrella", s: "Take an umbrella.", i: "☂️"}, {w: "Unicorn", s: "A magic unicorn.", i: "🦄"},
+            {w: "UFO", s: "A flying UFO.", i: "🛸"}, {w: "Unlock", s: "Unlock the door.", i: "🔓"},
+            {w: "Uniform", s: "Wear a uniform.", i: "🥋"}, {w: "Up", s: "Look up high.", i: "⬆️"}
+        ],
+        'V': [
+            {w: "Van", s: "A big van.", i: "🚐"}, {w: "Violin", s: "Play the violin.", i: "🎻"},
+            {w: "Volcano", s: "A hot volcano.", i: "🌋"}, {w: "Vegetable", s: "Eat your vegetables.", i: "🥦"},
+            {w: "Vampire", s: "A scary vampire.", i: "🧛"}, {w: "Vest", s: "Wear a yellow vest.", i: "🦺"}
+        ],
+        'W': [
+            {w: "Watermelon", s: "A big watermelon.", i: "🍉"}, {w: "Whale", s: "A huge whale.", i: "🐳"},
+            {w: "Water", s: "Drink some water.", i: "💧"}, {w: "Window", s: "Look out the window.", i: "⊞"},
+            {w: "Wolf", s: "The wolf is howling.", i: "🐺"}, {w: "Watch", s: "Look at your watch.", i: "⌚"},
+            {w: "Worm", s: "A wiggly worm.", i: "🐛"}, {w: "Wood", s: "Hard wood.", i: "🪵"}
+        ],
+        'X': [
+            {w: "Xylophone", s: "Play the xylophone.", i: "🎹"}, {w: "X-ray", s: "An X-ray picture.", i: "☢"},
+        ],
+        'Y': [
+            {w: "Yoyo", s: "Play with a yoyo.", i: "🪀"}, {w: "Yellow", s: "The sun is yellow.", i: "🌞"},
+            {w: "Yarn", s: "Cats play with yarn.", i: "🧶"}, {w: "Yacht", s: "A big yacht.", i: "🛥️"},
+            {w: "Yak", s: "A hairy yak.", i: "🐃"}, {w: "Yogurt", s: "Eat some yogurt.", i: "🍨"}
+        ],
+        'Z': [
+            {w: "Zebra", s: "A striped zebra.", i: "🦓"}, {w: "Zoo", s: "Let's go to the zoo.", i: "🦁"},
+            {w: "Zero", s: "The number zero.", i: "0️⃣"}, {w: "Zipper", s: "Zip your jacket.", i: "🤐"},
+            {w: "Zombie", s: "A green zombie.", i: "🧟"}, {w: "Zucchini", s: "A green zucchini.", i: "🥒"}
+        ]
+    };
+    let currentMode = 'alpha';
+
+    // 1. 動態生成 A-Z 鍵盤
+    const alphabetGrid = document.getElementById('alphabet-grid');
+    for (let i = 65; i <= 90; i++) {
+        const u = String.fromCharCode(i);
+        const l = String.fromCharCode(i + 32);
+        const btn = document.createElement('button');
+        btn.className = 'alpha-btn';
+        btn.innerText = u + l;
+        btn.onclick = () => handleLetterClick(u, l);
+        alphabetGrid.appendChild(btn);
+    }
+
+    // 2. 處理模式切換
+   function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('btn-alpha').classList.remove('active');
+        document.getElementById('btn-vocab').classList.remove('active');
+        document.getElementById('btn-exam').classList.remove('active');
+        document.getElementById(`btn-${mode}`).classList.add('active');
+
+        if (mode === 'exam') {
+            document.getElementById('flashcard-area').style.display = 'none';
+            document.getElementById('alphabet-grid').style.display = 'none';
+            document.getElementById('exam-section').style.display = 'block';
+            
+            // 重置為「準備畫面」
+            document.getElementById('exam-intro').style.display = 'block';
+            document.getElementById('exam-play').style.display = 'none';
+            document.getElementById('exam-break').style.display = 'none';
+            
+            // 🌟 這裡隱藏：因為在準備畫面還沒有題目，先把它藏起來
+            document.getElementById('replay-btn').style.display = 'none';
+            
+        } else {
+            document.getElementById('exam-section').style.display = 'none';
+            document.getElementById('flashcard-area').style.display = 'flex';
+            document.getElementById('alphabet-grid').style.display = 'flex';
+            
+            // 🌟 這裡隱藏：切換回字母或盲盒模式時，把重聽按鈕藏起來
+            document.getElementById('replay-btn').style.display = 'none';
+            
+            if (mode === 'alpha') {
+                updateFlashcard("🔤", "", "");
+            } else {
+                updateFlashcard("🎁", "盲盒模式", "抽抽看會出現什麼單字呢？");
+            }
+        }
+    }
+
+    // 3. 處理字母點擊邏輯
+    function handleLetterClick(upper, lower) {
+        if (currentMode === 'alpha') {
+            updateFlashcard(upper + lower, "", "");
+            speak(upper);
+        } else if (currentMode === 'vocab') {
+            const wordsArray = dictionary[upper];
+            if (!wordsArray || wordsArray.length === 0) return;
+            const data = wordsArray[Math.floor(Math.random() * wordsArray.length)];
+            updateFlashcard(data.i, data.w, data.s);
+            speak(data.w + ". " + data.s);
+        }
+    }
+
+    function updateFlashcard(emoji, word, sentence) {
+        const emojiEl = document.getElementById('fc-emoji');
+        emojiEl.style.animation = 'none';
+        setTimeout(() => emojiEl.style.animation = 'bounceIn 0.5s', 10);
+        
+        emojiEl.innerText = emoji;
+        document.getElementById('fc-word').innerText = word;
+        document.getElementById('fc-sentence').innerText = sentence;
+    }
+
+    // --- 考試模式邏輯 ---
+    let currentQuizWord = null;
+    let allWords = []; 
+    let scoreCount = 0; // 🌟 紀錄連對幾題
+    Object.keys(dictionary).forEach(key => dictionary[key].forEach(item => allWords.push(item)));
+
+   function startExamGame() {
+        scoreCount = 0; // 開始測驗時歸零
+        document.getElementById('score-text').innerText = scoreCount;
+        document.getElementById('exam-intro').style.display = 'none';
+        document.getElementById('exam-play').style.display = 'block';
+        
+        // 🌟 測驗正式開始，把重聽按鈕變出來！
+        document.getElementById('replay-btn').style.display = 'inline-block';
+        
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        let shuffled = [...allWords].sort(() => 0.5 - Math.random());
+        currentQuizWord = shuffled[0];
+        let options = [shuffled[0], shuffled[1], shuffled[2]].sort(() => 0.5 - Math.random());
+
+        document.getElementById('exam-emoji').innerText = currentQuizWord.i;
+speak("Where is it? " + currentQuizWord.w + ".");
+
+        const optionsDiv = document.getElementById('exam-options');
+        optionsDiv.innerHTML = "";
+        options.forEach(opt => {
+            let btn = document.createElement('button');
+            btn.className = 'exam-btn';
+            btn.innerText = opt.w; 
+            btn.onclick = () => checkAnswer(opt.w);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedWord) {
+        if (selectedWord === currentQuizWord.w) {
+            document.getElementById('exam-emoji').innerText = "🎉";
+            speak("You got it!");
+            scoreCount++;
+            document.getElementById('score-text').innerText = scoreCount;
+
+            setTimeout(() => {
+                // 🌟 如果答對了 10 題 (或者是 10 的倍數)，就跳出休息畫面
+                if (scoreCount > 0 && scoreCount % 10 === 0) {
+                    showBreakScreen();
+                } else {
+                    nextQuestion();
+                }
+            }, 1500); // 答對後等 1.5 秒換題
+        } else {
+            speak("Try again.");
+        }
+    }
+
+    // 🌟 顯示休息畫面
+    function showBreakScreen() {
+        document.getElementById('exam-play').style.display = 'none';
+        document.getElementById('exam-break').style.display = 'block';
+        speak("Awesome! Do you want to take a break?"); // 語音鼓勵
+    }
+
+    // 🌟 繼續挑戰
+    function continueExam() {
+        document.getElementById('exam-break').style.display = 'none';
+        document.getElementById('exam-play').style.display = 'block';
+        nextQuestion();
+    }
+
+    function speak(t) {
+        window.speechSynthesis.cancel();
+        const m = new SpeechSynthesisUtterance(t);
+        m.lang = 'en-US'; m.rate = 0.70;
+        window.speechSynthesis.speak(m);
+    }
+// 🔊 重聽功能：再唸一次目前的單字
+    function replayAudio() {
+        // 確保目前有題目才發聲
+        if (currentQuizWord) {
+            // 使用句號結尾，確保發音標準不上揚
+            speak("Where is it? " + currentQuizWord.w + ".");
+        }
+    }
+</script>
+</body>
+</html>

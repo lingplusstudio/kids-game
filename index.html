@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>LINGPLUS 學習樂園</title>
+    <style>
+        body { font-family: '微軟正黑體', sans-serif; background-color: #FFF9C4; text-align: center; padding-top: 50px; }
+        h1 { color: #FF7043; font-size: 3.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        p { color: #795548; font-size: 1.2rem; font-weight: bold; }
+        
+        .menu { 
+            display: grid; 
+            grid-template-columns: repeat(2, 220px); /* 兩兩一排，比較整齊 */
+            justify-content: center; 
+            gap: 25px; 
+            margin-top: 40px; 
+        }
+
+        .btn { 
+            width: 220px; height: 220px; 
+            font-size: 1.6rem; color: white; border: none; border-radius: 40px;
+            cursor: pointer; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            line-height: 1.4;
+        }
+        .btn span { font-size: 3.5rem; margin-bottom: 10px; } /* 圖示放大 */
+        
+        /* 各按鈕顏色與陰影 */
+        .card { background-color: #42A5F5; box-shadow: 0 10px #1E88E5; }    /* 藍色-認讀卡 */
+        .pinyin { background-color: #AB47BC; box-shadow: 0 10px #8E24AA; }  /* 紫色-拼音 */
+        .math { background-color: #66BB6A; box-shadow: 0 10px #43A047; }    /* 綠色-數學 */
+        .english { background-color: #FFA726; box-shadow: 0 10px #FB8C00; } /* 橘色-英文 */
+
+        .btn:hover { transform: scale(1.05); }
+        .btn:active { transform: translateY(6px); box-shadow: 0 4px #666; }
+
+        .footer { margin-top: 50px; color: #BDBDBD; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <h1>🌟 LINGPLUS 🌟</h1>
+    <p>寶貝，今天想挑戰哪一個大冒險呢？</p>
+
+    <div class="menu">
+        <button class="btn card" onclick="location.href='card.html'">
+            <span>🐥</span>ㄅㄆㄇ<br>基礎認讀
+        </button>
+
+        <button class="btn pinyin" onclick="location.href='pinyin.html'">
+            <span>🎨</span>ㄅㄆㄇ<br>拼音大師
+        </button>
+
+        <button class="btn math" onclick="location.href='math.html'">
+            <span>🍎</span>1 2 3<br>數學小高手
+        </button>
+
+        <button class="btn english" onclick="location.href='abc.html'">
+            <span>🇺🇸</span>A B C<br>英文好朋友
+        </button>
+    </div>
+
+    <div class="footer">Powered by LINGPLUS Studio</div>
+
+</body>
+</html>
