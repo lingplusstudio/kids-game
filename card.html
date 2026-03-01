@@ -9,13 +9,12 @@
         .main-title { color: #0288D1; font-size: 2.8rem; margin-bottom: 10px; }
         .sub-title { color: #4FC3F7; font-size: 1.2rem; margin-bottom: 25px; }
         
-        /* 顯示區：修正初始文字過大問題 */
         #display-area { 
-            font-size: 3rem; /* 初始文字較小 */
+            font-size: 3rem; 
             margin: 30px auto; height: 180px; width: 80%;
             display: flex; align-items: center; justify-content: center; 
             color: #0288D1; border: 5px dashed #B3E5FC; border-radius: 20px;
-            transition: font-size 0.2s; /* 點擊時放大的動畫 */
+            transition: font-size 0.2s; 
         }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; padding: 20px; }
@@ -26,57 +25,28 @@
         }
         .bo-btn:active { transform: translateY(4px); box-shadow: 0 2px #81D4FA; }
         .bo-btn.vowel { background: #FFCC80; color: #E65100; box-shadow: 0 5px #FFB74D; }
-/* 拼音大師專屬：紫色大回首頁鈕 */
-    .home-btn-large {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: 85px;
-        height: 85px;
-        background-color: #9C27B0; /* 紫色 */
-        color: white;
-        text-decoration: none;
-        border-radius: 25px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px #7B1FA2;
-        transition: 0.2s;
-        z-index: 9999;
-        font-weight: bold;
-    }
 
-    .home-btn-large span {
-        font-size: 2.2rem;
-        margin-bottom: -5px;
-    }
+        .home-btn-large {
+            position: fixed; top: 20px; left: 20px;
+            width: 85px; height: 85px; background-color: #9C27B0; 
+            color: white; text-decoration: none; border-radius: 25px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 8px #7B1FA2; transition: 0.2s; z-index: 9999; font-weight: bold;
+        }
+        .home-btn-large span { font-size: 2.2rem; margin-bottom: -5px; }
+        .home-text { font-size: 1rem; }
+        .home-btn-large:active { transform: translateY(4px); box-shadow: 0 4px #7B1FA2; }
 
-    .home-text {
-        font-size: 1rem;
-    }
-
-    .home-btn-large:hover {
-        transform: scale(1.1);
-        filter: brightness(1.1);
-    }
-
-    .home-btn-large:active {
-        transform: translateY(4px);
-        box-shadow: 0 4px #7B1FA2;
-    }
-
-    /* 確保手機版標題不會被按鈕壓到 */
-    @media (max-width: 600px) {
-        .container { margin-top: 100px; }
-    }
+        @media (max-width: 600px) { .container { margin-top: 100px; } }
     </style>
 </head>
 <body>
+
 <a href="index.html" class="home-btn-large">
     <span>🏠</span>
     <div class="home-text">首頁</div>
 </a>
+
 <div class="container">
     <h1 class="main-title">ㄅㄆㄇ 注音大冒險</h1>
     <p class="sub-title">點點看，跟著聲音一起唸唸看喔！</p>
@@ -96,7 +66,6 @@
     const grid = document.getElementById('bopomofo-grid');
     const display = document.getElementById('display-area');
 
-    // 1. 產生注音按鈕
     bopomofo.forEach((char, index) => {
         const btn = document.createElement('button');
         btn.innerText = char;
@@ -110,17 +79,12 @@
         grid.appendChild(btn);
     });
 
-       function speak(text) {
+    function speak(text) {
         window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
-        
-        // 取得目前系統所有可用的老師清單
         const voices = window.speechSynthesis.getVoices();
         
-        // 🌟 尋找聲音的邏輯：
-        // 1. 先找電腦版的 Zhiwei
-        // 2. 如果沒 Zhiwei，找名字裡有「李牧」或「彬彬」或「波波」的人 (iPad 的男聲)
-        // 3. 最後才用預設聲音
+        // 尋找 Zhiwei 或 iPad 男聲 (李牧、彬彬等)
         let targetVoice = voices.find(v => v.name.includes("Zhiwei"));
 
         if (!targetVoice) {
@@ -128,23 +92,20 @@
                 v.name.includes("李牧") || 
                 v.name.includes("彬彬") || 
                 v.name.includes("波波") ||
-                v.name.includes("Male") // 廣泛搜尋標記為男聲的包
+                v.name.includes("Male")
             );
         }
 
-        if (targetVoice) {
-            msg.voice = targetVoice;
-        }
-
+        if (targetVoice) msg.voice = targetVoice;
         msg.lang = 'zh-TW';
-        msg.rate = 0.9; // 稍微快一點點，發音會更乾淨
+        msg.rate = 0.9; 
         msg.pitch = 1.0; 
         window.speechSynthesis.speak(msg);
     }
 
-    // 確保聲音清單在網頁載入時就準備好
+    // 修正載入邏輯
     window.speechSynthesis.onvoiceschanged = () => {
         window.speechSynthesis.getVoices();
     };
-</body>
+</script> </body>
 </html>
