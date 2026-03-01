@@ -469,22 +469,39 @@ speak("Where is it? " + currentQuizWord.w + ".");
         // 1. 強制停止之前的聲音
         window.speechSynthesis.cancel();
 
-        // 2. 建立發音物件（先不傳入文字）
         const m = new SpeechSynthesisUtterance();
         
-        // 🌟 核心修正：先處理文字，轉成小寫
-        // 加上一個空格或句號，有助於 iOS 判斷這是一個「單字」而非「拼寫字母」
+        // 🌟 處理文字：轉小寫並加點，避免唸成字母 A-B-C
         const processedText = t.toLowerCase() + "."; 
-
-        // 3. 設定參數
-        m.text = processedText; // 這裡才賦予文字
+        m.text = processedText;
         m.lang = 'en-US'; 
-        m.rate = 0.80;
+        m.rate = 0.8;
         m.pitch = 1.0;
+
+        // 🌟 核心修正：尋找英文男聲
+        const voices = window.speechSynthesis.getVoices();
+        
+        // 優先順序：電腦版 David > iPad 男聲 (Nathan/Evan/Aaron)
+        const maleVoice = voices.find(v => v.lang.includes("en") && (
+            v.name.includes("David") || 
+            v.name.includes("Nathan") || 
+            v.name.includes("Evan") || 
+            v.name.includes("Aaron") ||
+            v.name.includes("Male")
+        ));
+
+        if (maleVoice) {
+            m.voice = maleVoice;
+        }
 
         // 4. 開始發音
         window.speechSynthesis.speak(m);
     }
+
+    // 🌟 記得在腳本最後面也要加上這兩行，確保 iPad 能抓到英文老師名單
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
 // 🔊 重聽功能：再唸一次目前的單字
     function replayAudio() {
         // 確保目前有題目才發聲
