@@ -142,46 +142,41 @@
     window.speechSynthesis.speak(msg);
 }
 
-    // 3. 🌟 聲音測試實驗室 (V8：解決 iPad 顯示問題)
-    function createVoiceTester() {
-        const oldDiv = document.getElementById('lab-div');
-        if (oldDiv) oldDiv.remove();
-
+   function speak(text) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        
+        // 取得目前系統所有可用的老師清單
         const voices = window.speechSynthesis.getVoices();
-        const zhVoices = voices.filter(v => v.lang.includes("zh-TW"));
         
-        const testDiv = document.createElement('div');
-        testDiv.id = 'lab-div';
-        testDiv.style.cssText = "margin-top:50px; padding:20px; border-top:3px dashed #0288D1; background:#F1F8E9; border-radius:20px;";
-        
-        testDiv.innerHTML = `<h3>🎤 聲音實驗室 (V8)</h3><p>目前抓到 ${zhVoices.length} 位台灣老師：</p>`;
-        
-        if (zhVoices.length === 0) {
-            testDiv.innerHTML += "<p style='color:red;'>⚠️ 偵測不到老師，請點擊螢幕任意處或重新整理試試。</p>";
+        // 🌟 尋找聲音的邏輯：
+        // 1. 先找電腦版的 Zhiwei
+        // 2. 如果沒 Zhiwei，找名字裡有「李牧」或「彬彬」或「波波」的人 (iPad 的男聲)
+        // 3. 最後才用預設聲音
+        let targetVoice = voices.find(v => v.name.includes("Zhiwei"));
+
+        if (!targetVoice) {
+            targetVoice = voices.find(v => 
+                v.name.includes("李牧") || 
+                v.name.includes("彬彬") || 
+                v.name.includes("波波") ||
+                v.name.includes("Male") // 廣泛搜尋標記為男聲的包
+            );
         }
 
-        zhVoices.forEach(voice => {
-            const btn = document.createElement('button');
-            btn.style.cssText = "margin:8px; padding:12px; border-radius:10px; border:1px solid #ccc; cursor:pointer;";
-            btn.innerText = `試聽：${voice.name}`;
-            
-            btn.onclick = () => {
-                window.speechSynthesis.cancel();
-                const m = new SpeechSynthesisUtterance("ㄅ");
-                m.voice = voice;
-                m.lang = 'zh-TW';
-                m.rate = 0.9;
-                window.speechSynthesis.speak(m);
-                btn.style.backgroundColor = "#C8E6C9";
-            };
-            testDiv.appendChild(btn);
-        });
-        document.body.appendChild(testDiv);
+        if (targetVoice) {
+            msg.voice = targetVoice;
+        }
+
+        msg.lang = 'zh-TW';
+        msg.rate = 0.9; // 稍微快一點點，發音會更乾淨
+        msg.pitch = 1.0; 
+        window.speechSynthesis.speak(msg);
     }
 
-    // 確保 iPad 在聲音清單改變時能重新抓取
-    window.speechSynthesis.onvoiceschanged = createVoiceTester;
-    setTimeout(createVoiceTester, 1000);
-</script>
+    // 確保聲音清單在網頁載入時就準備好
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
 </body>
 </html>
