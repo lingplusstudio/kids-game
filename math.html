@@ -3,61 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <title>幼兒數學小天才</title>
-    <style>
-        body { font-family: '微軟正黑體', sans-serif; background-color: #F3E5F5; text-align: center; padding: 5px; margin: 0; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 10px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative; }
+   <style>
+        body { font-family: '微軟正黑體', sans-serif; background-color: #F3E5F5; text-align: center; padding: 10px; margin: 0; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative; }
+        
         h1 { color: #558B2F; margin: 5px 0; font-size: 1.2rem; display: inline-block; vertical-align: middle; }
         .score-board { display: inline-block; background: #FFEB3B; padding: 4px 12px; border-radius: 10px; border: 2px solid #FBC02D; font-weight: bold; font-size: 0.9rem; margin-left: 10px; vertical-align: middle; }
-        .level-select { margin: 8px 0; display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
-        .lvl-btn { padding: 5px 12px; border-radius: 10px; border: 2px solid #8BC34A; background: white; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; }
+.mute-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px; /* 放在右上角 */
+    width: 70px;
+    height: 70px;
+    background-color: #FF9800;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 9999;
+    box-shadow: 0 4px #E65100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mute-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px #E65100;
+}
+        /* 🌟 讓難度挑戰按鈕排更有空間 */
+        .level-select { 
+            margin: 15px 0 25px 0; /* 增加下方與題目的距離 */
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+        }
+        .lvl-btn { padding: 8px 15px; border-radius: 10px; border: 2px solid #8BC34A; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
         .lvl-btn.active { background: #8BC34A !important; color: white !important; }
+
+        /* 🌟 讓數學題目區域上下撐開 */
+        .math-row { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; /* 置中對齊符號 */
+            gap: 15px; 
+            margin: 25px 0; /* 增加與按鈕區的垂直距離 */
+        }
         
-        .math-row { display: flex; justify-content: center; align-items: flex-start; gap: 5px; margin: 10px 0; }
-        .item-group { display: flex; flex-direction: column; align-items: center; width: 190px; } 
+        .item-group { display: flex; flex-direction: column; align-items: center; width: 200px; } 
         
         .plate { 
             background: #FFFDE7; 
             border: 3px dashed #FFCA28; 
-            border-radius: 15px; 
+            border-radius: 20px; 
             width: 180px;      
-            height: 130px;     
+            height: 140px; /* 稍微長高一點 */
             display: flex; 
             justify-content: center; 
             align-items: center; 
             overflow: hidden; 
-            padding: 5px; 
+            padding: 8px; 
             transition: all 0.2s; 
         }
 
-        .number-label { font-size: 2.2rem; color: #558B2F; font-weight: bold; margin-top: 5px; height: 40px; }
-        .symbol { font-size: 3rem; font-weight: 900; color: #2E7D32; margin-top: 30px; width: 40px; }
-        .options { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; max-width: 400px; margin-left: auto; margin-right: auto; }
-        .num-btn { width: 55px; height: 55px; font-size: 1.5rem; cursor: pointer; border-radius: 15px; border: none; background: #8BC34A !important; color: white !important; box-shadow: 0 4px #689F38; font-weight: bold; }
+        /* 🌟 讓盤子下方的數字標籤更有距離感 */
+        .number-label { 
+            font-size: 2.4rem; 
+            color: #558B2F; 
+            font-weight: bold; 
+            margin-top: 12px; /* 數字與盤子不要貼太近 */
+            height: 45px; 
+        }
+
+        .symbol { font-size: 3.5rem; font-weight: 900; color: #2E7D32; margin-top: -30px; width: 50px; }
+
+        /* 🌟 答案選項區 */
+        .options { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+            margin: 20px 0; 
+            max-width: 450px; 
+            margin-left: auto; 
+            margin-right: auto; 
+        }
+        .num-btn { width: 62px; height: 62px; font-size: 1.7rem; cursor: pointer; border-radius: 18px; border: none; background: #8BC34A !important; color: white !important; box-shadow: 0 5px #689F38; font-weight: bold; }
         .num-btn:active { transform: translateY(2px); box-shadow: 0 1px #689F38; }
-        #message { font-size: 1.2rem; height: 25px; color: #E91E63; font-weight: bold; margin: 5px 0; }
-        .next-btn { padding: 10px 40px; font-size: 1.2rem; cursor:pointer; border-radius: 50px; background: #33691E; color: white; border: none; box-shadow: 0 4px #1B5E20; font-weight: bold; margin-bottom: 5px; }
-        .home-btn-large { position: fixed; top: 5px; left: 5px; width: 45px; height: 45px; background-color: #9C27B0; color: white; text-decoration: none; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; font-weight: bold; font-size: 0.6rem; opacity: 0.8; }
+
+        #message { font-size: 1.3rem; height: 30px; color: #E91E63; font-weight: bold; margin: 15px 0; }
+        .next-btn { padding: 12px 45px; font-size: 1.3rem; cursor:pointer; border-radius: 50px; background: #33691E; color: white; border: none; box-shadow: 0 5px #1B5E20; font-weight: bold; margin-bottom: 15px; }
         
-/* 當 iPad 橫著拿時 */
-@media (orientation: landscape) {
-    .game-area {
-        display: flex;
-        justify-content: space-around; /* 讓內容左右排開 */
-        align-items: center;
-    }
-    .button-panel {
-        width: 40%; /* 按鈕放在右邊 */
-    }
-    .visual-display {
-        width: 50%; /* 水果或大字放在左邊 */
-    }
-}
+        /* 🌟 放大後的回首頁按鈕 */
+        .home-btn-large { 
+            position: fixed; 
+            top: 10px; 
+            left: 10px; 
+            width: 70px;  /* 從 50px 放大到 70px */
+            height: 70px; /* 從 50px 放大到 70px */
+            background-color: #9C27B0; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 15px; /* 圓角也加深一點點 */
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 9999; 
+            font-weight: bold; 
+            font-size: 0.9rem; /* 文字放大 */
+            opacity: 0.9; 
+            box-shadow: 0 4px #7B1FA2; /* 加個陰影更有按鈕感 */
+        }
+
+        /* 讓按鈕裡的 🏠 圖案大一點 (如果有用的話) */
+        .home-btn-large span {
+            font-size: 1.8rem !important;
+            margin-bottom: 2px;
+        }
+        /* 當 iPad 橫著拿時的優化 */
+        @media (orientation: landscape) {
+            .container { padding: 15px 30px; }
+            .game-area {
+                display: flex;
+                justify-content: center; 
+                align-items: center;
+                gap: 40px; /* 增加左右兩邊的距離 */
+                margin-top: 10px;
+            }
+            .button-panel {
+                width: 45%; 
+            }
+            .visual-display {
+                width: 45%; 
+            }
+            .math-row { margin: 15px 0; }
+        }
     </style>
 </head>
 <body>
 
-<a href="index.html" class="home-btn-large"><span>🏠</span><div>首頁</div></a>
-
+<a href="index.html" class="home-btn-large" onclick="stopSpeech()">
+    <span>🏠</span>首頁
+</a>
+<button id="mute-btn" onclick="toggleMute()" class="mute-btn">
+    <span id="mute-icon">🔊</span>
+</button>
 <div class="container">
 <div id="start-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 20px;">
     <h2 style="color: #558B2F;">準備好當數學小天才了嗎？</h2>
@@ -67,8 +159,8 @@
     <div class="score-board">⭐ 答對：<span id="score">0</span></div>
 
     <div class="level-select">
-        <button class="lvl-btn active" onclick="changeLevel(1, this)">初級挑戰</button>
-        <button class="lvl-btn" onclick="changeLevel(2, this)">中級挑戰</button>
+        <button class="lvl-btn active" onclick="changeLevel(1, this)">初級練習</button>
+        <button class="lvl-btn" onclick="changeLevel(2, this)">中級練習</button>
         <button class="lvl-btn" onclick="changeLevel(3, this)">高級挑戰</button>
         <button class="lvl-btn" onclick="changeLevel(4, this)" style="border-color: #E91E63; color: #E91E63;">終極挑戰</button>
     </div>
@@ -149,7 +241,33 @@
         nextQuestion();
     }
 
+// 在腳本最上方定義開關變數
+    let isMuted = false;
+
+    // 語音開關切換函數
+    function toggleMute() {
+        isMuted = !isMuted;
+        const icon = document.getElementById('mute-icon');
+        const btn = document.getElementById('mute-btn');
+        
+        if (isMuted) {
+            icon.innerText = '🔇';
+            btn.style.backgroundColor = '#9e9e9e'; // 變灰色
+            btn.style.boxShadow = '0 4px #757575';
+            window.speechSynthesis.cancel(); // 關閉時立刻停止目前正在說的話
+        } else {
+            icon.innerText = '🔊';
+            btn.style.backgroundColor = '#FF9800'; // 變橘色
+            btn.style.boxShadow = '0 4px #E65100';
+            speak("語音已開啟"); // 開啟時給個提示
+        }
+    }
+
+    // 🌟 整合後的 speak 函數
     function speak(text) {
+        // 如果目前是靜音模式，就直接收工，什麼都不做
+        if (isMuted) return;
+
         window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
         
@@ -173,12 +291,22 @@
         }
 
         msg.lang = 'zh-TW';
-        msg.rate = 0.8; // 拼音建議 0.8，聽組合音比較清楚
+        msg.rate = 0.8; // 速度 0.8 對小朋友來說比較剛好
         msg.pitch = 1.0; 
         window.speechSynthesis.speak(msg);
     }
+// 強制停止所有語音的函數
+function stopSpeech() {
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+}
 
-    // 🌟 記得！這兩行要放在 speak 函數外面（通常放在最後面）
+// 🌟 進階保險：當頁面跳轉、關閉或重新整理時，自動停止語音
+window.onbeforeunload = function() {
+    window.speechSynthesis.cancel();
+};
+    // 這行確保老師清單有載入完成
     window.speechSynthesis.onvoiceschanged = () => {
         window.speechSynthesis.getVoices();
     };
@@ -203,12 +331,18 @@
         let isSubtraction = Math.random() > 0.5;
         let n1, n2;
 
-        if (currentLevel === 1) {
+       if (currentLevel === 1) {
             n1 = Math.floor(Math.random() * 5) + 1;
             n2 = Math.floor(Math.random() * (isSubtraction ? n1 : (5 - n1))) + 1;
         } else if (currentLevel === 2) {
-            n1 = Math.floor(Math.random() * 9) + 1;
-            n2 = Math.floor(Math.random() * (isSubtraction ? n1 : (10 - n1))) + 1;
+            // 🌟 進階模式：調整為 17 以內
+            if (isSubtraction) {
+                n1 = Math.floor(Math.random() * 11) + 7; // n1 範圍在 7~17
+                n2 = Math.floor(Math.random() * n1) + 1; // n2 不超過 n1
+            } else {
+                n1 = Math.floor(Math.random() * 13) + 1; // n1 範圍 1~13
+                n2 = Math.floor(Math.random() * (17 - n1)) + 1; // 確保相加最高 17
+            }
         } else if (currentLevel === 3) {
             n1 = Math.floor(Math.random() * 11) + 10; 
             n2 = Math.floor(Math.random() * (isSubtraction ? (n1 - 1) : 5)) + 1;
@@ -240,7 +374,7 @@
                 // 🌟 使用修正後的減法水果函數 (無紅框箭頭)
                 lp.innerHTML = getFruitHTML("🍎", n1);
                 rp.innerHTML = getSubtractionMiddleHTML("🍎", n1, n2);
-                speak(`有 ${n1} 個蘋果，減掉 ${n2} 個蘋果，剩下幾個蘋果呢？`);
+                speak(`${n1} 減 ${n2} 等於多少？`);
             }
         } else {
             answer = n1 + n2;

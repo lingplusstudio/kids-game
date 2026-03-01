@@ -574,29 +574,28 @@
         return Object.keys(pinyinDict).some(key => key.startsWith(prefix));
     }
 
-    // 2. 替換掉原本的 createBtns，加入阻擋功能
+   // 2. 替換掉原本的 createBtns，加入阻擋功能與「11+10」排版
     function createBtns(list, target, typeNum) {
         const container = document.getElementById(target);
         if(!container) return;
-        list.forEach(char => {
+        
+        // 🌟 加入 index 來計算目前是第幾個按鈕
+        list.forEach((char, index) => {
             const btn = document.createElement('button');
             btn.className = 'bo-btn btn-s' + typeNum;
             btn.innerText = char;
             btn.onclick = () => {
                 const prefix = (currentMode === 'learn') ? 's' : 'q';
                 
-                // 讀取目前已經拼上去的字
                 let c1 = document.getElementById(prefix + '1').innerText;
                 let c2 = document.getElementById(prefix + '2').innerText;
                 let c3 = document.getElementById(prefix + '3').innerText;
                 
-                // 模擬如果點下去後的組合
                 let next_c1 = (typeNum === 1) ? char : c1;
                 let next_c2 = (typeNum === 2) ? char : c2;
                 let next_c3 = (typeNum === 3) ? char : c3;
                 let combined = next_c1 + next_c2 + next_c3;
 
-                // 🌟 核心檢查：如果組合起來不合法，就彈出錯誤並阻擋
                 if (combined.length > 1 && !isValidPrefix(combined)) {
                     showError(`❌ 「${combined}」不能這樣拼喔！`);
                     speak("不能這樣拼喔");
@@ -606,6 +605,14 @@
                 }
             };
             container.appendChild(btn);
+
+            // 🌟 核心修正：如果是聲母(typeNum 1) 且唸到「ㄏ」(index 10) 之後就換行
+            if (typeNum === 1 && index === 10) {
+                const lineBreak = document.createElement('div');
+                lineBreak.style.flexBasis = '100%'; // 強制佔滿一行來達到換行效果
+                lineBreak.style.height = '0';
+                container.appendChild(lineBreak);
+            }
         });
     }
 
@@ -667,13 +674,32 @@
         if (q.s === ans.s && q.m === ans.m && q.y === ans.y && q.t === ans.t) {
             window.speechSynthesis.cancel();
             speak("答對了！妳好棒！");
-            setTimeout(nextQuiz, 2500);
+            setTimeout(nextQuiz, 3500);
         } else { speak("差一點點，再試一次喔！"); }
     }
 
     function playFullSound() {
-        const s = document.getElementById('s1').innerText + document.getElementById('s2').innerText + document.getElementById('s3').innerText + document.getElementById('s4').innerText;
-        if(s) speak(s);
+        // 1. 取得目前畫面上的注音
+        const c1 = document.getElementById('s1').innerText;
+        const c2 = document.getElementById('s2').innerText;
+        const c3 = document.getElementById('s3').innerText;
+        const c4 = document.getElementById('s4').innerText;
+        
+        // 2. 組合出查詢用的 key (例如 "ㄅ" + "" + "ㄚ" + "ˇ")
+        const combinedKey = c1 + c2 + c3 + c4;
+        
+        if (!combinedKey) return;
+
+        // 3. 查字典，看看有沒有對應的國字
+        const chineseWord = pinyinDict[combinedKey];
+
+        if (chineseWord) {
+            // 🌟 如果查得到（例如 ㄅㄚˇ 查到 "靶"），就唸出那個字，電腦就會發出正確的結合音
+            speak(chineseWord);
+        } else {
+            // 如果查不到（組合太奇怪），就分開唸
+            speak(combinedKey);
+        }
     }
 
   function speak(text) {
@@ -724,6 +750,14 @@
     createBtns(b1, 'g1', 1);
     createBtns(b2, 'g2', 2);
     createBtns(b3, 'g3', 3);
+// 🌟 只要點擊網頁任何按鈕或地方，就立刻中斷語音
+    document.addEventListener('click', function(e) {
+        // 如果點擊的是「重聽」按鈕，我們不希望它剛停就沒聲音
+        // 所以判斷：除非點的是重聽，否則一律先停掉舊語音
+        if (!e.target.closest('#replay-btn')) { 
+            window.speechSynthesis.cancel();
+        }
+    }, true);
 </script>
 </body>
 </html>

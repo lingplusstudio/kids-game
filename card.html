@@ -107,5 +107,13 @@
     window.speechSynthesis.onvoiceschanged = () => {
         window.speechSynthesis.getVoices();
     };
+// 🌟 只要點擊網頁任何按鈕或地方，就立刻中斷語音
+    document.addEventListener('click', function(e) {
+        // 如果點擊的是「重聽」按鈕，我們不希望它剛停就沒聲音
+        // 所以判斷：除非點的是重聽，否則一律先停掉舊語音
+        if (!e.target.closest('#replay-btn')) { 
+            window.speechSynthesis.cancel();
+        }
+    }, true);
 </script> </body>
 </html>
