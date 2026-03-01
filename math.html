@@ -368,10 +368,9 @@ window.onbeforeunload = function() {
             if (currentLevel >= 3) {
                 lp.innerText = n1;
                 rp.innerText = n2;
-                let title = (currentLevel === 4) ? "終極挑戰" : "挑戰題";
-                speak(`${title}：${n1} 減 ${n2} 等於多少？`);
+                // 🌟 移除 title，直接唸題目
+                speak(`${n1} 減 ${n2} 等於多少？`);
             } else {
-                // 🌟 使用修正後的減法水果函數 (無紅框箭頭)
                 lp.innerHTML = getFruitHTML("🍎", n1);
                 rp.innerHTML = getSubtractionMiddleHTML("🍎", n1, n2);
                 speak(`${n1} 減 ${n2} 等於多少？`);
@@ -382,8 +381,8 @@ window.onbeforeunload = function() {
             if (currentLevel >= 3) {
                 lp.innerText = n1;
                 rp.innerText = n2;
-                let title = (currentLevel === 4) ? "終極挑戰" : "挑戰題";
-                speak(`${title}：${n1} 加 ${n2} 等於多少？`);
+                // 🌟 移除 title，直接唸題目
+                speak(`${n1} 加 ${n2} 等於多少？`);
             } else {
                 lp.innerHTML = getFruitHTML("🍊", n1);
                 rp.innerHTML = getFruitHTML("🍊", n2);
