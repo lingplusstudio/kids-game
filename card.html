@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-測試版
     <meta charset="UTF-8">
     <title>注音符號大冒險</title>
     <style>
@@ -111,38 +110,7 @@
         grid.appendChild(btn);
     });
 
-    // 2. 改良版發音函數：優先鎖定妳喜歡的老師
-    function speak(text) {
-    window.speechSynthesis.cancel();
-    const msg = new SpeechSynthesisUtterance(text);
-    
-    const voices = window.speechSynthesis.getVoices();
-    
-    // 🌟 這裡就是「點名表」：把妳看到的中文老師名字都加進去
-    const targetVoice = voices.find(v => v.name.includes("Zhiwei")) || // 電腦首選
-                        voices.find(v => v.name.includes("嘉里")) ||   // iPad 男聲首選
-                        voices.find(v => v.name.includes("月")) ||
-                        voices.find(v => v.name.includes("田田")) ||
-                        voices.find(v => v.name.includes("李牧")) ||
-                        voices.find(v => v.name.includes("理生")) ||
-                        voices.find(v => v.name.includes("莉莉")) ||
-                        voices.find(v => v.name.includes("陶陶")) ||
-                        voices.find(v => v.name.includes("婷婷")) ||
-                        voices.find(v => v.name.includes("嵐嵐")) ||
-                        voices.find(v => v.name.includes("瑄文")) ||   // iPad 女聲備選
-                        voices.find(v => v.name.includes("美佳"));     // 最後預設
-
-    if (targetVoice) {
-        msg.voice = targetVoice;
-    }
-
-    msg.lang = 'zh-TW';
-    msg.rate = 0.9; 
-    msg.pitch = 1.0; 
-    window.speechSynthesis.speak(msg);
-}
-
-   function speak(text) {
+       function speak(text) {
         window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
         
