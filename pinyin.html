@@ -676,32 +676,39 @@
         if(s) speak(s);
     }
 
-   function speak(text) {
-    window.speechSynthesis.cancel();
-    
-    const msg = new SpeechSynthesisUtterance();
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  function speak(text) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        
+        // 取得系統所有老師清單
+        const voices = window.speechSynthesis.getVoices();
+        
+        // 🌟 鎖定妳要的老師 (電腦 Zhiwei / iPad 男聲)
+        let targetVoice = voices.find(v => v.name.includes("Zhiwei"));
 
-    // 🌟 只針對這三個字在 iPad 上切換為英文發音
-    if (isIOS && text === "ㄅ") {
-        msg.text = "b";         // 發出 /b/ 音
-        msg.lang = 'en-US';
-    } else if (isIOS && text === "ㄆ") {
-        msg.text = "p";         // 發出 /p/ 音
-        msg.lang = 'en-US';
-    } else if (isIOS && text === "ㄈ") {
-        msg.text = "f";         // 發出 /f/ 音
-        msg.lang = 'en-US';
-    } else {
-        // 其他所有注音（包含ㄇ）維持原本的中文發音
-        msg.text = text;
+        if (!targetVoice) {
+            targetVoice = voices.find(v => 
+                v.name.includes("李牧") || 
+                v.name.includes("彬彬") || 
+                v.name.includes("波波") ||
+                v.name.includes("Male")
+            );
+        }
+
+        if (targetVoice) {
+            msg.voice = targetVoice;
+        }
+
         msg.lang = 'zh-TW';
+        msg.rate = 0.8; // 拼音建議 0.8，聽組合音比較清楚
+        msg.pitch = 1.0; 
+        window.speechSynthesis.speak(msg);
     }
 
-    msg.rate = 0.8; 
-    msg.pitch = 1.0; 
-    window.speechSynthesis.speak(msg);
-}
+    // 🌟 記得！這兩行要放在 speak 函數外面（通常放在最後面）
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
 
     function clearAll() {
         ['q1','q2','q3','q4'].forEach(id => document.getElementById(id).innerText = "");
